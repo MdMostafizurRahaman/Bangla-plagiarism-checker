@@ -1,29 +1,28 @@
-# Bangla Plagiarism Checker - Complete Setup Guide
+# Bangla Plagiarism Checker
 
 ## সম্পূর্ণ বাংলা প্ল্যাজিয়ারিজম চেকার প্রজেক্ট
 
-এটি একটি সম্পূর্ণ বাংলা প্ল্যাজিয়ারিজম ডিটেকশন সিস্টেম যা PDF থেকে টেক্সট নিষ্কাশন এবং প্ল্যাজিয়ারিজম চেক করতে পারে।
+এটি একটি আধুনিক বাংলা প্ল্যাজিয়ারিজম ডিটেকশন সিস্টেম যা Google Gemini AI ব্যবহার করে PDF থেকে টেক্সট নিষ্কাশন এবং Sentence Transformers ব্যবহার করে প্ল্যাজিয়ারিজম চেক করে।
 
 ### 🚀 Features (বৈশিষ্ট্য)
 
 #### PDF Text Extraction
-- **উন্নত OCR**: OpenCV এবং Tesseract ব্যবহার করে
-- **টেবিল ডিটেকশন**: PDF থেকে টেবিল টেক্সট নিষ্কাশন
-- **Line Preservation**: লাইন গ্যাপ সমস্যা সমাধান
-- **Mixed Language**: বাংলা-ইংরেজি মিশ্রিত টেক্সট হ্যান্ডলিং
-- **Unicode Normalization**: বাংলা টেক্সটের জন্য সঠিক এনকোডিং
+- **Gemini AI Integration**: Google Gemini AI ব্যবহার করে উন্নত বাংলা টেক্সট নিষ্কাশন
+- **Full PDF Processing**: সম্পূর্ণ PDF প্রক্রিয়াকরণ (সব পেজ)
+- **Bangla Content Detection**: বাংলা কনটেন্ট ভ্যালিডেশন
+- **Fallback OCR**: Gemini ব্যর্থ হলে OCR ব্যাকআপ
 
 #### Plagiarism Detection
 - **Semantic Similarity**: Sentence Transformers মডেল ব্যবহার
-- **Exact Matching**: সঠিক টেক্সট ম্যাচিং
-- **Paraphrase Detection**: প্যারাফ্রেজ চেক
-- **Corpus Management**: ডকুমেন্ট কর্পাস ব্যবস্থাপনা
+- **Configurable Threshold**: কাস্টমাইজযোগ্য সিমিলারিটি থ্রেশহোল্ড
+- **Paraphrase Detection**: প্যারাফ্রেজ চেকিং
+- **Detailed Analysis**: বিস্তারিত ম্যাচ রিপোর্ট
 
 #### User Interface
-- **Modern UI**: Next.js এবং TailwindCSS
-- **Drag & Drop**: ফাইল আপলোড
-- **Real-time Analysis**: লাইভ প্ল্যাজিয়ারিজম চেক
-- **Results Visualization**: হাইলাইটেড রেজাল্ট
+- **Clean Modern UI**: Next.js এবং TailwindCSS
+- **Drag & Drop Upload**: সহজ ফাইল আপলোড
+- **Real-time Results**: তাৎক্ষণিক রেজাল্ট দেখানো
+- **Full Text View**: সম্পূর্ণ নিষ্কাশিত টেক্সট দেখা
 
 ## 📁 Project Structure
 
@@ -31,17 +30,28 @@
 bangla-plagiarism-checker/
 ├── backend/                    # FastAPI Backend
 │   ├── main.py                # Main API server
-│   ├── enhanced_pdf_extractor.py  # Advanced PDF processing
-│   ├── plagiarism_detector.py # Plagiarism detection engine
-│   ├── corpus_manager.py      # Document corpus management
 │   ├── requirements.txt       # Python dependencies
-│   └── uploads/              # File upload directory
+│   ├── uploads/              # Temporary file storage
+│   └── app/
+│       ├── core/
+│       │   ├── enhanced_pdf_extractor.py  # OCR-based extraction
+│       │   ├── gemini_pdf_extractor.py    # Gemini AI extraction
+│       │   ├── plagiarism_detector.py     # Plagiarism detection
+│       │   └── corpus_manager.py          # Document corpus
+│       └── models/
+│           └── schemas.py                 # Pydantic models
 ├── frontend/                  # Next.js Frontend
 │   ├── src/
-│   │   ├── components/       # React components
-│   │   ├── pages/           # Next.js pages
-│   │   ├── utils/           # API utilities
-│   │   └── types/           # TypeScript definitions
+│   │   ├── components/
+│   │   │   ├── FileUpload.tsx    # File upload component
+│   │   │   ├── PlagiarismResults.tsx  # Results display
+│   │   │   └── TextInput.tsx     # Text input component
+│   │   ├── pages/
+│   │   │   └── index.tsx         # Main page
+│   │   ├── utils/
+│   │   │   └── api.ts            # API utilities
+│   │   └── types/
+│   │       └── index.ts          # TypeScript types
 │   ├── package.json         # Node.js dependencies
 │   ├── tailwind.config.js   # TailwindCSS config
 │   └── next.config.js       # Next.js configuration
@@ -54,14 +64,14 @@ bangla-plagiarism-checker/
 
 1. **Python 3.8+** installed
 2. **Node.js 18+** and npm installed
-3. **Tesseract OCR** for text extraction
+3. **Google Gemini API Key** (for PDF extraction)
 4. **Git** for version control
 
 ### Step 1: Clone Repository
 
 ```bash
-cd "d:\Bangla Plagiarism"
-# Already in project directory
+git clone https://github.com/MdMostafizurRahaman/Bangla-plagiarism-checker.git
+cd bangla-plagiarism-checker
 ```
 
 ### Step 2: Backend Setup
@@ -73,22 +83,18 @@ cd backend
 pip install -r requirements.txt
 ```
 
-#### Install Tesseract OCR
+#### Configure Environment Variables
 
-**Windows:**
-```bash
-# Download and install from: https://github.com/UB-Mannheim/tesseract/wiki
-# Add to PATH: C:\Program Files\Tesseract-OCR
+Create a `.env` file in the backend directory:
+
+```env
+GEMINI_API_KEY=your_gemini_api_key_here
 ```
 
-**Linux/Mac:**
-```bash
-# Ubuntu/Debian
-sudo apt install tesseract-ocr tesseract-ocr-ben
-
-# macOS
-brew install tesseract tesseract-lang
-```
+**Get Gemini API Key:**
+1. Go to [Google AI Studio](https://makersuite.google.com/app/apikey)
+2. Create a new API key
+3. Copy the key to your `.env` file
 
 #### Download ML Models
 
@@ -118,15 +124,6 @@ cd ../frontend
 npm install
 ```
 
-#### Environment Configuration
-
-```bash
-# Copy environment file
-cp .env.example .env.local
-
-# Edit .env.local if needed (default values should work)
-```
-
 #### Start Frontend Development Server
 
 ```bash
@@ -137,44 +134,36 @@ Frontend will be available at: `http://localhost:3000`
 
 ## 🚀 Usage (ব্যবহার)
 
-### 1. PDF Text Extraction
+### PDF Text Extraction & Plagiarism Check
 
-1. Open `http://localhost:3000`
-2. **File Upload** ট্যাবে যান
-3. PDF ফাইল drag & drop করুন অথবা ক্লিক করে সিলেক্ট করুন
-4. **Extract Text** বাটনে ক্লিক করুন
-5. নিষ্কাশিত টেক্সট দেখুন
+1. Open `http://localhost:3000` in your browser
+2. **Upload PDF**: Drag & drop or click to select a PDF file
+3. **Extract & Check**: Click the "Extract Text & Check Plagiarism" button
+4. **View Results**:
+   - Extracted text (first 500 characters shown)
+   - Plagiarism score and analysis
+   - Matched text segments
+   - Similarity percentage
 
-### 2. Text Analysis
+### Manual Text Check
 
-1. **Text Input** ট্যাবে যান
-2. টেক্সট টাইপ করুন অথবা পেস্ট করুন
-3. সেটিংস কনফিগার করুন:
-   - **Similarity Threshold**: 0.7 (default)
-   - **Check Paraphrase**: ✅
-   - **Language**: Bangla
-4. **Analyze Text** বাটনে ক্লিক করুন
-
-### 3. Results Analysis
-
-- **Overall Score**: সামগ্রিক প্ল্যাজিয়ারিজম স্কোর
-- **Matched Text**: হাইলাইটেড ম্যাচ
-- **Source Information**: সোর্স ডকুমেন্ট তথ্য
-- **Risk Level**: ঝুঁকির মাত্রা (Low/Medium/High)
+1. Click "Check Text Manually" button
+2. Enter or paste text in the textarea
+3. Adjust settings if needed:
+   - Similarity threshold (default: 0.7)
+   - Check paraphrase (default: enabled)
+4. Click "Check Plagiarism" to analyze
 
 ## 🔧 Configuration
 
 ### Backend Configuration
 
-`backend/main.py` এ কনফিগারেশন পরিবর্তন করুন:
+Key settings in `backend/main.py`:
 
 ```python
 # File upload settings
 MAX_FILE_SIZE = 50 * 1024 * 1024  # 50MB
 ALLOWED_EXTENSIONS = ['.pdf']
-
-# OCR settings
-OCR_LANGUAGE = 'ben+eng'  # Bangla + English
 
 # Plagiarism settings
 DEFAULT_THRESHOLD = 0.7
@@ -183,122 +172,138 @@ DEFAULT_CHECK_PARAPHRASE = True
 
 ### Frontend Configuration
 
-`.env.local` ফাইল এডিট করুন:
-
-```env
-NEXT_PUBLIC_API_URL=http://localhost:8000
-NEXT_PUBLIC_MAX_FILE_SIZE=52428800
-NEXT_PUBLIC_DEFAULT_LANGUAGE=bangla
-```
+The frontend automatically connects to `http://localhost:8000`. For production deployment, update the API URL in `frontend/src/utils/api.ts`.
 
 ## 📝 API Endpoints
 
-### Text Extraction
-- `POST /extract-text` - PDF থেকে টেক্সট নিষ্কাশন
-- `POST /batch-extract` - একাধিক PDF প্রক্রিয়াকরণ
+### Core Endpoints
+- `GET /` - API information
+- `GET /health` - Health check
 
-### Plagiarism Check
-- `POST /check-plagiarism` - প্ল্যাজিয়ারিজম চেক
-- `GET /health` - API স্বাস্থ্য পরীক্ষা
+### Text Extraction
+- `POST /extract-text` - Extract text from PDF using Gemini AI
+- `POST /batch-extract` - Process multiple PDFs (background task)
+
+### Plagiarism Detection
+- `POST /check-plagiarism` - Check text for plagiarism
+- `POST /check-file-plagiarism` - Extract from PDF and check plagiarism
 
 ### Corpus Management
-- `POST /add-to-corpus` - কর্পাসে ডকুমেন্ট যোগ
-- `GET /corpus/stats` - কর্পাস পরিসংখ্যান
-- `POST /corpus/search` - কর্পাস অনুসন্ধান
+- `POST /add-to-corpus` - Add document to corpus
+- `GET /corpus/stats` - Get corpus statistics
+- `POST /corpus/search` - Search corpus documents
 
 ## 🐛 Troubleshooting
 
 ### Common Issues
 
-#### 1. Tesseract Not Found
+#### 1. Gemini API Key Issues
 ```bash
-# Windows: Add to PATH
-set PATH=%PATH%;C:\Program Files\Tesseract-OCR
-
-# Linux: Install package
-sudo apt install tesseract-ocr tesseract-ocr-ben
+# Check if key is set
+cd backend
+python -c "import os; print('GEMINI_API_KEY' in os.environ)"
 ```
 
 #### 2. Model Download Failed
 ```bash
-# Manual download
+# Manual download with specific model
 python -c "
-import nltk
-nltk.download('punkt')
-nltk.download('stopwords')
+from sentence_transformers import SentenceTransformer
+model = SentenceTransformer('sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2')
+print('Model downloaded!')
 "
 ```
 
-#### 3. PDF Processing Slow
-- Large PDFs: সাইজ 50MB এর নিচে রাখুন
-- OCR Settings: `force_ocr=False` সেট করুন যদি টেক্সট স্তর আছে
-
-#### 4. Port Already in Use
+#### 3. Port Already in Use
 ```bash
-# Backend port change
-uvicorn main:app --port 8001
+# Kill process using port 8000
+netstat -ano | findstr :8000
+taskkill /PID <PID> /F
 
-# Frontend port change
-npm run dev -- -p 3001
+# Or use different port
+uvicorn main:app --port 8001
 ```
+
+#### 4. Frontend Connection Issues
+- Ensure backend is running on port 8000
+- Check CORS settings in `main.py`
+- Verify API URL in `frontend/src/utils/api.ts`
 
 ## 📊 Performance Tips
 
-1. **PDF Optimization**: PDF ফাইল 50MB এর নিচে রাখুন
-2. **OCR Settings**: শুধুমাত্র প্রয়োজনে OCR ব্যবহার করুন
-3. **Batch Processing**: একাধিক ফাইলের জন্য batch API ব্যবহার করুন
-4. **Corpus Size**: কর্পাস সাইজ 10,000 ডকুমেন্টের নিচে রাখুন
+1. **PDF Size**: Keep PDFs under 50MB for best performance
+2. **Text Length**: Gemini processes full PDFs but results may be truncated for very long documents
+3. **Similarity Threshold**: Lower values (0.5-0.7) for academic papers, higher (0.8+) for strict checking
+4. **Corpus Size**: Keep corpus manageable for faster searches
 
 ## 🛡️ Security Notes
 
-1. File uploads শুধুমাত্র PDF এ সীমাবদ্ধ
-2. File size limits প্রয়োগ করা
-3. Input validation সব API endpoints এ
-4. CORS properly configured
+1. File uploads limited to PDF files only
+2. File size limits enforced (50MB max)
+3. Input validation on all endpoints
+4. CORS configured for frontend domain
+5. API keys stored securely in environment variables
 
 ## 📚 Dependencies
 
 ### Backend (Python)
-- FastAPI - Web framework
-- OpenCV - Image processing
-- Tesseract - OCR engine
-- Sentence Transformers - ML models
-- SQLite - Database
+- **FastAPI** - Web framework
+- **PyMuPDF** - PDF processing
+- **google-generativeai** - Gemini AI integration
+- **sentence-transformers** - ML similarity detection
+- **python-multipart** - File upload handling
+- **uvicorn** - ASGI server
 
 ### Frontend (Node.js)
-- Next.js - React framework
-- TailwindCSS - Styling
-- Axios - HTTP client
-- React Dropzone - File uploads
-- Lucide React - Icons
+- **Next.js** - React framework
+- **React** - UI library
+- **axios** - HTTP client
+- **react-dropzone** - File upload component
+- **lucide-react** - Icons
+- **tailwindcss** - CSS framework
 
 ## 🤝 Contributing
 
 1. Fork the repository
-2. Create feature branch
-3. Make changes
-4. Test thoroughly
-5. Submit pull request
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
 ## 📄 License
 
-This project is for educational purposes. Use responsibly for academic integrity checking.
+This project is for educational and research purposes. Please use responsibly for academic integrity checking.
 
 ---
 
 ## Quick Start Commands
 
 ```bash
-# Start Backend
-cd backend && uvicorn main:app --reload
+# Backend Setup
+cd backend
+pip install -r requirements.txt
+# Add GEMINI_API_KEY to .env file
+uvicorn main:app --reload
 
-# Start Frontend (new terminal)
-cd frontend && npm run dev
+# Frontend Setup (new terminal)
+cd frontend
+npm install
+npm run dev
 
 # Access Application
 # Frontend: http://localhost:3000
 # Backend API: http://localhost:8000
 # API Docs: http://localhost:8000/docs
 ```
+
+## 🎯 Key Features Summary
+
+✅ **Full PDF Processing** - Processes all pages with Gemini AI
+✅ **Bangla Language Support** - Optimized for Bengali text extraction
+✅ **Real-time Plagiarism Check** - Instant results with detailed analysis
+✅ **Clean Modern UI** - Simple, emoji-free interface
+✅ **Configurable Settings** - Adjustable similarity thresholds
+✅ **Corpus Management** - Add and search reference documents
+✅ **API Documentation** - Auto-generated FastAPI docs
 
 **সবকিছু প্রস্তুত! এখন আপনি সম্পূর্ণ বাংলা প্ল্যাজিয়ারিজম চেকার ব্যবহার করতে পারেন।** 🎉
